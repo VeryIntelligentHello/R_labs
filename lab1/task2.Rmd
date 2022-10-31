@@ -1,0 +1,25 @@
+---
+title: "task2"
+author: "Askar Karimov"
+date: "2022-10-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 2
+```{r echo=TRUE, error=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+get_id <- function(data){
+  merged <- Reduce(function(x, y) merge(x, y, by = 'id'), all_data)
+  means <- rowMeans(merged[-which(colnames(merged) == 'id')])  
+  return (data.frame(id=merged$id, mean_temp=means))
+}
+
+```
+
+```{r echo=TRUE, error=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+load("data/lab1_e2.Rdata")
+get_id(data)
+```

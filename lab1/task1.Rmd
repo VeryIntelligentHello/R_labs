@@ -1,0 +1,36 @@
+---
+title: "task1"
+author: "Askar Karimov"
+date: "2022-10-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 1
+
+```{r echo=TRUE, error=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+    remove_space <- function(data){
+    res <- gsub(" ", "", data, fixed = TRUE) 
+    res <- as.numeric(res) 
+    
+    if (any(is.na(res)))
+      return(data) 
+    else
+      return(res)
+  }
+```
+
+```{r echo=TRUE, error=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+    fix_data <- function(data)
+      return(sapply(data, remove_space))
+```
+```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+data <- read.csv("data/lab1_e1.csv")
+data
+```
+```{r echo=TRUE, error=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+fix_data(data)
+```
