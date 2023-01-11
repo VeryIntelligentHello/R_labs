@@ -1,0 +1,60 @@
+---
+title: "lab2"
+author: "Askar Karimov"
+output: html_document
+---
+
+# Задание 10
+Используйте файл RH_T.csv
+Найдите самую холодную среду и самый теплый четверг в Екатеринбурге.
+```{r}
+data <- read.csv("data/RH_T.csv")
+day <- unlist(data["YYYYMMDD"])
+temp <- unlist(data["T2M"])
+
+wed_min <- 100
+for(wed_day in seq(1, length(day), 7)){
+  if(temp[wed_day] < wed_min){
+    wed_min <- temp[wed_day]
+    wed_day_min = wed_day
+  }
+}
+
+print("Самая холодная среда:")
+day[wed_day_min]
+temp[wed_day_min]
+
+thu_min <- -100
+for(thu_day in seq(2, length(day), 7)){
+  if(temp[thu_day] > thu_min){
+    thu_min <- temp[thu_day]
+    thu_day_min = thu_day
+  }
+}
+
+print("Самый теплый четверг:")
+day[thu_day_min]
+temp[thu_day_min]
+
+
+```
+
+# Задание 25
+Используйте файл Payment_and_value_of_Care-Hospital.csv
+Напишите функцию, которая на вход принимает название города, а на выход выдает именованный список длины 4, в который записаны название города, названия округа и штата в котором этот город расположен, количество больниц в этом городе, в которых осуществляется экстренная медицинская помощь. Названия элементов списка должны быть ‘City’, ‘Country’, ‘State’ и ‘Hospitals with Emergency Services’.
+```{r}
+data2 <-read.csv("data/Payment_and_Value_of_Care-Hospital.csv")
+
+get_list <- function(city_name){
+  temp <- data2[data2$City == city_name, c('County.Name', 'State', 'Facility.Name')]
+  country <- unique(temp$County.Name)
+  state <- unique(temp$State)
+  hospitals <- length(unique(temp$Facility.Name))
+  
+  return(list('City'=city_name, 'County'=country, 'State'=state, 'Hospitals with Emergency Services'=hospitals))
+}
+```
+
+```{r}
+get_list("LAS VEGAS")
+```

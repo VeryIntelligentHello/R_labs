@@ -1,0 +1,73 @@
+---
+title: "lab3"
+author: "Askar Karimov"
+output: html_document
+---
+# Задание 10
+Удалите строки, в которых есть пропущенные значения и приведите данные к формату tidydata. Отобразите динамику лесовосстановления по годам с помощью линейного графика для любого из федеральных округов, просуммировав значения соотвествующих субъектов федерации. Подпишите значения на графике. Для минимального значения сделайте подпись красным цветом. Отрегулируйте местоположение подписей так, чтобы рисунок был максимально наглядным. Придумайте новые назания графика и осей.
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+data <- read.csv("data/reforest.csv", na = c("-", "NA"))
+data = drop_na(data)
+```
+
+```{r}
+tmp <- grepl('федеральный округ', data$Region)
+n <- 3
+start <- which(tmp == "TRUE")[n] + 1
+end <- which(tmp == "TRUE")[n + 1] - 1
+new_tb <- data[start:end, ]
+new_data <- pivot_longer(new_tb, !Region, names_to = "Year", values_to = "Value") 
+
+target_data <- new_data %>% group_by(Region) %>% mutate(Sum = sum(Value))
+
+```
+
+```{r}
+ggplot(target_data, aes(x = Year, y = Value, group = Region)) +
+  geom_line(aes(color = Region)) +
+  geom_point(aes(color = Region)) +
+  scale_colour_manual(values = 
+                        c('red', 'magenta','royalblue','green')) +
+  labs(x = 'Год', 
+       y = 'Гектары (тыс.)',
+       color = 'Регионы') + 
+  theme_classic()
+```
+
+# Задание 1
+Объедините таблицы в одну, уберите столбец с территорией торговли, т.к. там только Евросоюз, оставим только строки с экспортом и импортом, вынесете данные по экспорту и импорту в отдельные переменные. Отобразите структуру экспорта продукции из Евросоюза по ведущим партнерам в виде столбчатой диаграммы. Обозначьте разные группы экспортируемых товаров разными цветами. Для каждого партера подпишите значение экспорта. Для каждого партнера подпишите какова доля (процент) каждой из групп экспортируемых товаров в общем экспорте. Отрегулируйте местоположение подписей так, чтобы рисунок был максимально наглядным. Придумайте новые названия графика и осей.
+
+```{r}
+load('data/trades.RData')
+```
+
+```{r}
+data <- data.frame(Reduce(function(x, y) rbind(x, y), trades))
+data <- data[,!names(data) %in% c("geo")]
+
+import <- data %>% filter(indic_et == 'Imports in million of ECU/EURO')
+export <- data %>% filter(indic_et == 'Exports in million of ECU/EURO')
+
+united_data <- bind_rows(export, import)
+leaders <- subset(export, export$value >= 10000) 
+```
+```{r}
+gg <-  ggplot(leaders, aes(x = partner, y = values, fill = sitc06)) + geom_col(position = "dodge") + 
+  xlab('Партнеры') + ylab('Объем экспорта') +
+  ggtitle('Ведущие страны по экспорту') + scale_fill_discrete(name = 'Товары на экспорт') + 
+  coord_flip() + theme_bw() + 
+  theme(plot.background = element_rect(colour = 'NA'),legend.position=c(0.7,0.6))
+plot(gg)
+```
+```{r}
+gg <-  ggplot(export, aes(x = partner, y = values, fill = sitc06)) + geom_col(position = "dodge") + 
+  xlab('Партнеры') + ylab('Объем экспорта') +
+  ggtitle('Общий объем экспорта в Европе в 2008-2019 гг') + scale_fill_discrete(name = 'Товары на экспорт') + 
+  coord_flip() + theme_bw() + 
+  theme(plot.background = element_rect(colour = NA), legend.position=c(0.7,0.6))
+plot(gg)
+```
